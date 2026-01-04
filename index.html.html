@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>class 8 information</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Hind+Siliguri:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0984e3;
+            --secondary: #2d3436;
+            --accent: #00cec9;
+            --bg: #f0f2f5;
+            --sidebar-bg: #1e272e;
+            --white: #ffffff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Poppins', 'Hind Siliguri', sans-serif; background-color: var(--bg); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+
+        /* Mobile Header / Navbar */
+        .mobile-header {
+            display: none; background: var(--sidebar-bg); color: white;
+            padding: 15px 20px; justify-content: space-between; align-items: center;
+            z-index: 3000; position: sticky; top: 0;
+        }
+        .menu-toggle { font-size: 24px; cursor: pointer; color: var(--accent); }
+
+        /* Sidebar Design */
+        .sidebar {
+            width: 280px; background: var(--sidebar-bg); color: white;
+            display: flex; flex-direction: column; padding: 30px 0;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.1); height: 100vh;
+            position: fixed; left: 0; top: 0; transition: 0.3s ease; z-index: 2500;
+        }
+        
+        /* Main Content Design */
+        .main-content { margin-left: 280px; flex: 1; padding: 30px; overflow-y: auto; transition: 0.3s; }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 992px) {
+            .sidebar { left: -280px; } /* Hide sidebar on mobile */
+            .sidebar.open { left: 0; }
+            .main-content { margin-left: 0; padding: 20px; }
+            .mobile-header { display: flex; }
+            .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2400; }
+            .overlay.active { display: block; }
+        }
+
+        /* Sidebar Buttons */
+        .sidebar h2 { text-align: center; font-size: 22px; margin-bottom: 30px; color: var(--accent); }
+        .sidebar button {
+            background: none; border: none; color: #b2bec3; padding: 15px 25px;
+            text-align: left; font-size: 16px; cursor: pointer; transition: 0.2s; border-left: 4px solid transparent;
+        }
+        .sidebar button:hover, .sidebar button.active { background: rgba(255,255,255,0.05); color: var(--white); border-left: 4px solid var(--accent); }
+
+        /* Admin UI */
+        .admin-only { display: none; background: #eef2f7; padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 1px dashed var(--primary); }
+        .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 10px; }
+        input, textarea { padding: 12px; border: 1px solid #ddd; border-radius: 8px; width: 100%; margin-bottom: 10px; font-size: 14px; }
+        textarea { height: 120px; }
+        .btn-add { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: 600; width: 100%; }
+
+        /* Tables & Cards */
+        .table-wrapper { width: 100%; overflow-x: auto; background: white; border-radius: 10px; border: 1px solid #eee; }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        th, td { padding: 12px; text-align: center; border: 1px solid #f1f1f1; font-size: 14px; }
+        th { background: #f8f9fa; color: #636e72; }
+
+        .big-data-card { background: white; padding: 25px; margin-bottom: 20px; border-radius: 15px; border-left: 6px solid var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .big-data-card h3 { margin-bottom: 10px; color: var(--secondary); font-size: 20px; }
+        .big-data-card p { white-space: pre-wrap; color: #555; line-height: 1.6; }
+
+        /* Login Modal */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 4000; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
+        .login-card { background: white; padding: 30px; border-radius: 15px; width: 90%; max-width: 350px; text-align: center; }
+        .login-actions { display: flex; gap: 10px; }
+        .btn-login { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 8px; flex: 2; cursor: pointer; }
+        .btn-cancel { background: #eee; padding: 12px; border-radius: 8px; flex: 1; cursor: pointer; border: none; }
+
+        .section { display: none; animation: fadeIn 0.3s; }
+        .section.active { display: block; }
+        @keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
+    </style>
+</head>
+<body>
+
+<div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+
+<div class="mobile-header">
+    <span class="menu-toggle" onclick="toggleMenu()">☰</span>
+    <span style="font-weight: 600; letter-spacing: 1px;">IDEAL SCHOOL</span>
+    <span onclick="openLogin()" style="cursor:pointer">🔐</span>
+</div>
+
+<div class="sidebar" id="sidebar">
+    <h2 id="brand">IDEAL SCHOOL</h2>
+    <button onclick="showSection('welcome')" class="active">🏠 Home</button>
+    <button onclick="showSection('sir')">👨‍🏫 Teachers</button>
+    <button onclick="showSection('routine')">📅 Routine</button>
+    <button onclick="showSection('notice')">📢 Notices</button>
+    <button onclick="showSection('syllabus')">📖 Syllabus</button>
+    <button id="logoutBtn" onclick="logout()" style="display:none; color: #ff7675; margin-top: 20px;">⬅️ Logout Admin</button>
+    <button id="loginBtn" style="margin-top:auto; background: #2d3436; border-top:1px solid #444;" onclick="openLogin()">🔐 Admin Login</button>
+</div>
+
+<div class="main-content">
+    <div id="welcome" class="section active">
+        <div style="background: linear-gradient(135deg, #0984e3, #00cec9); color: white; padding: 40px 20px; border-radius: 15px; text-align: center;">
+            <h1>Welcome to Digital Portal</h1>
+            <p>Select a category to view details.</p>
+        </div>
+        <div id="admin-status" style="display:none; text-align:center; color: var(--primary); font-weight: bold; margin-top: 20px;">🔓 ADMIN MODE ACTIVE</div>
+    </div>
+
+    <div id="routine" class="section">
+        <h2>7-Period Routine</h2>
+        <div class="admin-only">
+            <input type="text" id="rDay" placeholder="Day (e.g. Sat)">
+            <div class="input-grid">
+                <input type="text" id="p1" placeholder="P1"> <input type="text" id="p2" placeholder="P2">
+                <input type="text" id="p3" placeholder="P3"> <input type="text" id="p4" placeholder="P4">
+                <input type="text" id="p5" placeholder="P5"> <input type="text" id="p6" placeholder="P6">
+                <input type="text" id="p7" placeholder="P7">
+            </div>
+            <button class="btn-add" onclick="addRoutine()">Add Row</button>
+        </div>
+        <div class="table-wrapper">
+            <table>
+                <thead><tr><th>Day</th><th>P1</th><th>P2</th><th>P3</th><th>P4</th><th>P5</th><th>P6</th><th>P7</th><th class="adm-cell" style="display:none">X</th></tr></thead>
+                <tbody id="routineBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="notice" class="section">
+        <h2>📢 Notice Board</h2>
+        <div class="admin-only">
+            <input type="text" id="nTitle" placeholder="Title">
+            <textarea id="nBody" placeholder="Notice Details..."></textarea>
+            <button class="btn-add" onclick="addNotice()">Post Notice</button>
+        </div>
+        <div id="noticeDisplay"></div>
+    </div>
+
+    <div id="syllabus" class="section">
+        <h2>📖 Academic Syllabus</h2>
+        <div class="admin-only">
+            <input type="text" id="syClass" placeholder="Class">
+            <textarea id="syBody" placeholder="Syllabus Details..."></textarea>
+            <button class="btn-add" onclick="addSyllabus()">Add Syllabus</button>
+        </div>
+        <div id="syDisplay"></div>
+    </div>
+
+    <div id="sir" class="section">
+        <h2>👨‍🏫 Teachers</h2>
+        <div class="admin-only">
+            <input type="text" id="sName" placeholder="Name">
+            <input type="text" id="sSub" placeholder="Subject">
+            <input type="text" id="sPhone" placeholder="Phone">
+            <button class="btn-add" onclick="addSir()">Save</button>
+        </div>
+        <div class="table-wrapper">
+            <table style="min-width: 600px;">
+                <thead><tr><th>Name</th><th>Subject</th><th>Phone</th><th class="adm-cell" style="display:none">X</th></tr></thead>
+                <tbody id="sirBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="loginModal">
+    <div class="login-card">
+        <h3>Admin Login</h3><br>
+        <input type="password" id="adminPass" placeholder="Password">
+        <div class="login-actions">
+            <button class="btn-cancel" onclick="closeLogin()">Cancel</button>
+            <button class="btn-login" onclick="verifyLogin()">Login</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let isAdmin = false;
+
+    // Responsive Menu Toggle
+    function toggleMenu() {
+        document.getElementById('sidebar').classList.toggle('open');
+        document.getElementById('overlay').classList.toggle('active');
+    }
+
+    function showSection(id) {
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        document.querySelectorAll('.sidebar button').forEach(b => b.classList.remove('active'));
+        if(window.innerWidth <= 992) toggleMenu(); // Auto close menu on mobile
+    }
+
+    function openLogin() { document.getElementById('loginModal').style.display = 'flex'; }
+    function closeLogin() { document.getElementById('loginModal').style.display = 'none'; document.getElementById('adminPass').value = ''; }
+    
+    function verifyLogin() {
+        if(document.getElementById('adminPass').value === "1234") {
+            isAdmin = true; toggleUI(); closeLogin();
+        } else { alert("Wrong!"); }
+    }
+
+    function logout() { isAdmin = false; toggleUI(); showSection('welcome'); }
+
+    function toggleUI() {
+        document.querySelectorAll('.admin-only').forEach(b => b.style.display = isAdmin ? 'block' : 'none');
+        document.querySelectorAll('.adm-cell').forEach(c => c.style.display = isAdmin ? 'table-cell' : 'none');
+        document.getElementById('loginBtn').style.display = isAdmin ? 'none' : 'block';
+        document.getElementById('logoutBtn').style.display = isAdmin ? 'block' : 'none';
+        document.getElementById('admin-status').style.display = isAdmin ? 'block' : 'none';
+        document.getElementById('brand').innerText = isAdmin ? "ADMIN PANEL" : "IDEAL SCHOOL";
+    }
+
+    // Functions for Adding Data (Same logic as before)
+    function addRoutine() {
+        const ps = [1,2,3,4,5,6,7].map(i => document.getElementById('p'+i).value);
+        let row = document.getElementById('routineBody').insertRow();
+        row.innerHTML = `<td style="font-weight:600; background:#f0f7ff;">${document.getElementById('rDay').value}</td>` + 
+                        ps.map(p => `<td>${p}</td>`).join('') + 
+                        `<td class="adm-cell">${isAdmin ? '<button onclick="this.parentElement.parentElement.remove()">X</button>' : ''}</td>`;
+        toggleUI();
+    }
+
+    function addNotice() {
+        let div = document.createElement('div'); div.className="big-data-card";
+        div.innerHTML = `<h3>${document.getElementById('nTitle').value}</h3><p>${document.getElementById('nBody').value}</p>${isAdmin ? '<button style="color:red; cursor:pointer" onclick="this.parentElement.remove()">Delete</button>' : ''}`;
+        document.getElementById('noticeDisplay').prepend(div);
+    }
+
+    function addSyllabus() {
+        let div = document.createElement('div'); div.className="big-data-card";
+        div.innerHTML = `<h3>${document.getElementById('syClass').value}</h3><p>${document.getElementById('syBody').value}</p>${isAdmin ? '<button style="color:red; cursor:pointer" onclick="this.parentElement.remove()">Delete</button>' : ''}`;
+        document.getElementById('syDisplay').prepend(div);
+    }
+
+    function addSir() {
+        let row = document.getElementById('sirBody').insertRow();
+        row.innerHTML = `<td>${document.getElementById('sName').value}</td><td>${document.getElementById('sSub').value}</td><td>${document.getElementById('sPhone').value}</td><td class="adm-cell"><button onclick="this.parentElement.parentElement.remove()">X</button></td>`;
+        toggleUI();
+    }
+</script>
+</body>
+</html>
